@@ -11,12 +11,15 @@
       --bg: #0d0d0f;
       --surface: #17181c;
       --surface2: #1f2027;
+      --surface3: #26272f;
       --border: #2a2b33;
       --accent: #6c63ff;
-      --accent2: #ff6584;
       --text: #e8e8f0;
       --muted: #7b7c8e;
-      --green: #22c55e;
+      --hot: #ff4d4d;
+      --warm: #ff9900;
+      --cool: #22c55e;
+      --new: #38bdf8;
     }
 
     body {
@@ -28,53 +31,84 @@
 
     /* ── Header ── */
     header {
-      padding: 28px 32px 20px;
+      padding: 22px 32px 18px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,15,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
     }
 
-    .logo {
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
+    .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; }
     .logo span { color: var(--accent); }
 
-    .meta {
-      font-size: 0.8rem;
+    .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+    .meta { font-size: 0.75rem; color: var(--muted); }
+    .meta strong { color: var(--text); }
+
+    .keyword-tag {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
       color: var(--muted);
     }
+    .keyword-tag span { color: var(--accent); font-weight: 600; }
 
     /* ── Controls ── */
     .controls {
-      padding: 20px 32px;
+      padding: 14px 32px;
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 16px;
       flex-wrap: wrap;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
     }
 
-    .control-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+      max-width: 260px;
     }
-
-    label {
-      font-size: 0.8rem;
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       color: var(--muted);
-      white-space: nowrap;
+      pointer-events: none;
     }
+    .search-wrap input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 10px 7px 32px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap input::placeholder { color: var(--muted); }
+
+    .control-group { display: flex; align-items: center; gap: 8px; }
+
+    label { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
 
     input[type="range"] {
       -webkit-appearance: none;
-      width: 140px;
+      width: 110px;
       height: 4px;
       background: var(--border);
       border-radius: 2px;
@@ -82,21 +116,20 @@
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 15px; height: 15px;
       background: var(--accent);
       border-radius: 50%;
       cursor: pointer;
     }
 
     input[type="number"] {
-      width: 72px;
+      width: 66px;
       background: var(--surface2);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 5px 8px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       text-align: center;
     }
 
@@ -106,142 +139,228 @@
       color: var(--text);
       padding: 6px 10px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
     }
 
-    .badge {
+    .count-badge {
       background: var(--accent);
       color: #fff;
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: 20px;
+      margin-left: auto;
     }
 
     /* ── Grid ── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 28px 32px;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 18px;
+      padding: 24px 32px;
     }
 
     /* ── Card ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      transition: transform 0.15s, border-color 0.15s;
       display: flex;
       flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
     .card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
       border-color: var(--accent);
+      box-shadow: 0 8px 32px rgba(108,99,255,0.12);
     }
 
-    .card-thumb {
+    .card-thumb-wrap {
+      position: relative;
       width: 100%;
       aspect-ratio: 16/9;
-      object-fit: cover;
       background: var(--surface2);
-      display: block;
+      overflow: hidden;
     }
+    .card-thumb {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .card:hover .card-thumb { transform: scale(1.04); }
 
     .card-thumb-placeholder {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: var(--surface2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 2rem;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 2.2rem;
     }
 
-    .card-body {
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
+    /* Temperature badge */
+    .temp-badge {
+      position: absolute;
+      top: 10px; left: 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
+    .temp-hot   { background: rgba(255,77,77,0.18);  color: var(--hot);  border: 1px solid rgba(255,77,77,0.35); }
+    .temp-warm  { background: rgba(255,153,0,0.18);  color: var(--warm); border: 1px solid rgba(255,153,0,0.35); }
+    .temp-cool  { background: rgba(34,197,94,0.15);  color: var(--cool); border: 1px solid rgba(34,197,94,0.3); }
+    .temp-new   { background: rgba(56,189,248,0.15); color: var(--new);  border: 1px solid rgba(56,189,248,0.3); }
+
+    .card-body { padding: 14px 15px 10px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 
     .page-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-weight: 600; font-size: 0.88rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .stats {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .stats { display: flex; gap: 6px; flex-wrap: wrap; }
 
     .stat {
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 4px 8px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      display: flex; align-items: center; gap: 3px;
     }
-
-    .stat strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .stat.highlight {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .stat strong { color: var(--text); font-weight: 600; }
+    .stat.highlight { border-color: var(--accent); color: var(--accent); }
     .stat.highlight strong { color: var(--accent); }
 
     .card-footer {
-      padding: 0 16px 14px;
+      padding: 0 15px 14px;
+      display: flex; gap: 7px;
     }
 
-    .lib-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
+    .btn {
+      flex: 1;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      font-size: 0.72rem;
       color: var(--muted);
       text-decoration: none;
       border: 1px solid var(--border);
-      padding: 5px 10px;
-      border-radius: 6px;
-      transition: border-color 0.15s, color 0.15s;
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: none;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.copied { border-color: var(--cool); color: var(--cool); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      max-width: 560px;
       width: 100%;
-      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      animation: slideUp 0.2s ease;
     }
-    .lib-link:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Empty state ── */
+    .modal-thumb-wrap {
+      position: relative;
+      width: 100%; aspect-ratio: 16/9;
+      background: var(--surface2);
+    }
+    .modal-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .modal-thumb-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; color: var(--muted);
+    }
+
+    .modal-close {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(0,0,0,0.5);
+      border: none; color: #fff;
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 1rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+    .modal-body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 14px; }
+
+    .modal-title { font-size: 1.05rem; font-weight: 700; }
+
+    .modal-rows { display: flex; flex-direction: column; gap: 8px; }
+
+    .modal-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+    .modal-row .label { color: var(--muted); }
+    .modal-row .value { color: var(--text); font-weight: 500; text-align: right; }
+
+    .modal-actions { display: flex; gap: 8px; }
+
+    .btn-primary {
+      flex: 1; padding: 10px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 9px;
+      font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-secondary {
+      padding: 10px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 9px;
+      font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-secondary.copied { border-color: var(--cool); color: var(--cool); }
+
+    /* ── Empty ── */
     .empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--muted);
+      grid-column: 1/-1;
+      text-align: center; padding: 80px 20px; color: var(--muted);
     }
-    .empty h2 { font-size: 1.1rem; margin-bottom: 8px; }
-    .empty p { font-size: 0.85rem; }
+    .empty h2 { font-size: 1.05rem; margin-bottom: 8px; }
+    .empty p { font-size: 0.83rem; }
 
-    /* ── Responsive ── */
     @media (max-width: 600px) {
       header, .controls, .grid { padding-left: 16px; padding-right: 16px; }
+      .search-wrap { max-width: 100%; }
     }
   </style>
 </head>
@@ -249,10 +368,21 @@
 
 <header>
   <div class="logo">ads<span>swipe</span></div>
-  <div class="meta" id="meta">Loading ads...</div>
+  <div class="header-right">
+    <div class="keyword-tag">keyword: <span id="keyword">—</span></div>
+    <div class="meta">Last update: <strong id="lastUpdate">—</strong></div>
+    <div class="meta" id="meta">Loading...</div>
+  </div>
 </header>
 
 <div class="controls">
+  <div class="search-wrap">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search page name..." />
+  </div>
+
   <div class="control-group">
     <label>Min creatives</label>
     <input type="range" id="slider" min="0" max="1000" value="100" step="10" />
@@ -262,108 +392,273 @@
   <div class="control-group">
     <label>Sort by</label>
     <select id="sort">
-      <option value="creatives">Most creatives</option>
       <option value="recent">Most recent</option>
+      <option value="creatives">Most creatives</option>
       <option value="oldest">Oldest first</option>
-      <option value="days">Days active ↑</option>
+      <option value="days">Days active</option>
     </select>
   </div>
 
-  <span class="badge" id="count">0 ads</span>
+  <span class="count-badge" id="count">0 ads</span>
 </div>
 
 <div class="grid" id="grid"></div>
 
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-thumb-wrap">
+      <div id="modalThumb"></div>
+      <button class="modal-close" id="modalClose">✕</button>
+      <div id="modalTempBadge" style="position:absolute;top:12px;left:12px;"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-title" id="modalTitle">—</div>
+      <div class="modal-rows" id="modalRows"></div>
+      <div class="modal-actions">
+        <a class="btn-primary" id="modalLink" href="#" target="_blank" rel="noopener">
+          ↗ Open on Facebook
+        </a>
+        <button class="btn-secondary" id="modalCopy">Copy ID</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   let allAds = [];
+  let currentAd = null;
 
+  // ── Helpers ──────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function tempInfo(ad) {
+    const c = ad.creativeCount ?? 0;
+    const d = ad.daysActive ?? 999;
+    if (c >= 500)                        return { cls: 'temp-hot',  label: '🔥 Hot' };
+    if (c >= 200)                        return { cls: 'temp-warm', label: '⚡ Warm' };
+    if (d <= 30 && c >= 100)             return { cls: 'temp-new',  label: '✨ New' };
+    return                                      { cls: 'temp-cool', label: '✅ Active' };
+  }
+
+  function formatDate(str) {
+    if (!str) return '—';
+    try { return new Date(str).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+    catch { return str; }
+  }
+
+  // ── Load ──────────────────────────────────────────────────
   async function loadAds() {
     try {
       const res = await fetch('data/ads.json');
       allAds = await res.json();
-    } catch {
-      allAds = [];
-    }
+    } catch { allAds = []; }
+
+    // Detect keyword from first ad's adUrl or fallback
+    const kw = detectKeyword();
+    document.getElementById('keyword').textContent = kw;
+
+    // Last update = now (file was just served)
+    document.getElementById('lastUpdate').textContent =
+      new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+
     render();
   }
 
+  function detectKeyword() {
+    // Try to read from a meta field if we embed it, else show generic label
+    if (allAds.length && allAds[0]._keyword) return allAds[0]._keyword;
+    return 'pink salt trick';
+  }
+
+  // ── Render ────────────────────────────────────────────────
   function render() {
-    const min = parseInt(document.getElementById('minInput').value) || 0;
-    const sort = document.getElementById('sort').value;
+    const min    = parseInt(document.getElementById('minInput').value) || 0;
+    const sort   = document.getElementById('sort').value;
+    const search = document.getElementById('search').value.trim().toLowerCase();
 
-    let ads = allAds.filter(a => (a.creativeCount || 0) >= min);
+    let ads = allAds.filter(a => (a.creativeCount ?? 0) >= min);
+    if (search) ads = ads.filter(a => (a.pageName ?? '').toLowerCase().includes(search));
 
-    if (sort === 'creatives') ads.sort((a, b) => b.creativeCount - a.creativeCount);
-    else if (sort === 'recent') ads.sort((a, b) => (a.daysActive ?? 9999) - (b.daysActive ?? 9999));
-    else if (sort === 'oldest') ads.sort((a, b) => (b.daysActive ?? 0) - (a.daysActive ?? 0));
-    else if (sort === 'days') ads.sort((a, b) => (a.daysActive ?? 9999) - (b.daysActive ?? 9999));
+    if (sort === 'creatives') ads.sort((a,b) => b.creativeCount - a.creativeCount);
+    else if (sort === 'recent') ads.sort((a,b) => (a.daysActive??9999) - (b.daysActive??9999));
+    else if (sort === 'oldest') ads.sort((a,b) => (b.daysActive??0) - (a.daysActive??0));
+    else if (sort === 'days')   ads.sort((a,b) => (a.daysActive??9999) - (b.daysActive??9999));
 
     document.getElementById('count').textContent = `${ads.length} ads`;
-    document.getElementById('meta').textContent =
-      `${allAds.length} total scraped · ${ads.length} shown`;
+    document.getElementById('meta').textContent  = `${allAds.length} scraped · ${ads.length} shown`;
 
     const grid = document.getElementById('grid');
     if (ads.length === 0) {
-      grid.innerHTML = `
-        <div class="empty">
-          <h2>No ads found</h2>
-          <p>Try lowering the minimum creatives threshold, or run the scraper first.</p>
-        </div>`;
+      grid.innerHTML = `<div class="empty"><h2>No ads found</h2><p>Try lowering the minimum or clearing the search.</p></div>`;
       return;
     }
 
-    grid.innerHTML = ads.map(ad => {
+    grid.innerHTML = ads.map((ad, i) => {
+      const { cls, label } = tempInfo(ad);
       const thumb = ad.imageUrl
-        ? `<img class="card-thumb" src="${escHtml(ad.imageUrl)}" alt="Ad creative" loading="lazy" onerror="this.replaceWith(makePlaceholder())" />`
+        ? `<img class="card-thumb" src="${escHtml(ad.imageUrl)}" loading="lazy" alt="" />`
         : `<div class="card-thumb-placeholder">🖼</div>`;
 
-      const days = ad.daysActive != null ? ad.daysActive : '?';
-      const startDate = ad.startDate || 'Unknown';
-      const creatives = ad.creativeCount ?? '?';
-      const page = ad.pageName || 'Unknown page';
-      const libId = ad.libraryId || '';
-      const adUrl = ad.adUrl || '#';
-
       return `
-        <div class="card">
-          ${thumb}
+        <div class="card" onclick="openModal(${i})" data-index="${i}">
+          <div class="card-thumb-wrap">
+            ${thumb}
+            <span class="temp-badge ${cls}">${label}</span>
+          </div>
           <div class="card-body">
-            <div class="page-name" title="${escHtml(page)}">${escHtml(page)}</div>
+            <div class="page-name" title="${escHtml(ad.pageName)}">${escHtml(ad.pageName || 'Unknown page')}</div>
             <div class="stats">
-              <div class="stat highlight">
-                <strong>${escHtml(String(creatives))}</strong> creatives
-              </div>
-              <div class="stat">
-                <strong>${escHtml(String(days))}</strong> days active
-              </div>
-              <div class="stat">
-                Started <strong>${escHtml(startDate)}</strong>
-              </div>
+              <div class="stat highlight"><strong>${ad.creativeCount ?? '?'}</strong>&nbsp;creatives</div>
+              <div class="stat"><strong>${ad.daysActive ?? '?'}</strong>&nbsp;days active</div>
+              ${ad.startDate ? `<div class="stat">Since <strong>${escHtml(ad.startDate)}</strong></div>` : ''}
             </div>
           </div>
           <div class="card-footer">
-            <a class="lib-link" href="${escHtml(adUrl)}" target="_blank" rel="noopener">
-              ↗ Library ID: ${escHtml(libId)}
-            </a>
+            <a class="btn" href="${escHtml(ad.adUrl||'#')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ View ad</a>
+            <button class="btn" onclick="event.stopPropagation(); copyId(this, '${escHtml(ad.libraryId||'')}')">Copy ID</button>
           </div>
         </div>`;
     }).join('');
   }
 
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+  // ── Copy ID ───────────────────────────────────────────────
+  function copyId(btn, id) {
+    if (!id) return;
+    navigator.clipboard.writeText(id).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+    });
   }
 
-  // Sync slider ↔ number input
-  const slider = document.getElementById('slider');
+  // ── Modal ──────────────────────────────────────────────────
+  // We need a stable index into the currently-rendered list
+  let renderedAds = [];
+
+  const _origRender = render;
+  // Patch render to also store rendered list
+  function render() {
+    const min    = parseInt(document.getElementById('minInput').value) || 0;
+    const sort   = document.getElementById('sort').value;
+    const search = document.getElementById('search').value.trim().toLowerCase();
+
+    let ads = allAds.filter(a => (a.creativeCount ?? 0) >= min);
+    if (search) ads = ads.filter(a => (a.pageName ?? '').toLowerCase().includes(search));
+
+    if (sort === 'creatives') ads.sort((a,b) => b.creativeCount - a.creativeCount);
+    else if (sort === 'recent') ads.sort((a,b) => (a.daysActive??9999) - (b.daysActive??9999));
+    else if (sort === 'oldest') ads.sort((a,b) => (b.daysActive??0) - (a.daysActive??0));
+    else if (sort === 'days')   ads.sort((a,b) => (a.daysActive??9999) - (b.daysActive??9999));
+
+    renderedAds = ads;
+
+    document.getElementById('count').textContent = `${ads.length} ads`;
+    document.getElementById('meta').textContent  = `${allAds.length} scraped · ${ads.length} shown`;
+
+    const grid = document.getElementById('grid');
+    if (ads.length === 0) {
+      grid.innerHTML = `<div class="empty"><h2>No ads found</h2><p>Try lowering the minimum or clearing the search.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = ads.map((ad, i) => {
+      const { cls, label } = tempInfo(ad);
+      const thumb = ad.imageUrl
+        ? `<img class="card-thumb" src="${escHtml(ad.imageUrl)}" loading="lazy" alt="" />`
+        : `<div class="card-thumb-placeholder">🖼</div>`;
+
+      return `
+        <div class="card" onclick="openModal(${i})">
+          <div class="card-thumb-wrap">
+            ${thumb}
+            <span class="temp-badge ${cls}">${label}</span>
+          </div>
+          <div class="card-body">
+            <div class="page-name" title="${escHtml(ad.pageName)}">${escHtml(ad.pageName || 'Unknown page')}</div>
+            <div class="stats">
+              <div class="stat highlight"><strong>${ad.creativeCount ?? '?'}</strong>&nbsp;creatives</div>
+              <div class="stat"><strong>${ad.daysActive ?? '?'}</strong>&nbsp;days active</div>
+              ${ad.startDate ? `<div class="stat">Since <strong>${escHtml(ad.startDate)}</strong></div>` : ''}
+            </div>
+          </div>
+          <div class="card-footer">
+            <a class="btn" href="${escHtml(ad.adUrl||'#')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ View ad</a>
+            <button class="btn" onclick="event.stopPropagation(); copyId(this, '${escHtml(ad.libraryId||'')}')">Copy ID</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function openModal(index) {
+    const ad = renderedAds[index];
+    if (!ad) return;
+    currentAd = ad;
+
+    const { cls, label } = tempInfo(ad);
+
+    // Thumb
+    const thumbEl = document.getElementById('modalThumb');
+    thumbEl.innerHTML = ad.imageUrl
+      ? `<img class="modal-thumb" src="${escHtml(ad.imageUrl)}" alt="" />`
+      : `<div class="modal-thumb-placeholder">🖼</div>`;
+
+    document.getElementById('modalTempBadge').innerHTML =
+      `<span class="temp-badge ${cls}">${label}</span>`;
+
+    document.getElementById('modalTitle').textContent = ad.pageName || 'Unknown page';
+
+    document.getElementById('modalRows').innerHTML = [
+      ['Library ID',   ad.libraryId || '—'],
+      ['Creatives',    ad.creativeCount != null ? `${ad.creativeCount} ads using this creative` : '—'],
+      ['Started',      ad.startDate || '—'],
+      ['Days active',  ad.daysActive != null ? `${ad.daysActive} days` : '—'],
+    ].map(([k,v]) => `
+      <div class="modal-row">
+        <span class="label">${k}</span>
+        <span class="value">${escHtml(String(v))}</span>
+      </div>`).join('');
+
+    document.getElementById('modalLink').href = ad.adUrl || '#';
+
+    const copyBtn = document.getElementById('modalCopy');
+    copyBtn.textContent = 'Copy ID';
+    copyBtn.classList.remove('copied');
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(ad.libraryId || '').then(() => {
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => { copyBtn.textContent = 'Copy ID'; copyBtn.classList.remove('copied'); }, 1500);
+      });
+    };
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── Controls wiring ────────────────────────────────────────
+  const slider   = document.getElementById('slider');
   const minInput = document.getElementById('minInput');
-  slider.addEventListener('input', () => { minInput.value = slider.value; render(); });
-  minInput.addEventListener('input', () => { slider.value = minInput.value; render(); });
+  slider.addEventListener('input',   () => { minInput.value = slider.value; render(); });
+  minInput.addEventListener('input', () => { slider.value  = minInput.value; render(); });
   document.getElementById('sort').addEventListener('change', render);
+  document.getElementById('search').addEventListener('input', render);
 
   loadAds();
 </script>
