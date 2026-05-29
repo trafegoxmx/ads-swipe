@@ -279,7 +279,7 @@
 
   async function loadAds() {
     try {
-      const res = await fetch('../data/ads.json');
+      const res = await fetch('data/ads.json');
       allAds = await res.json();
     } catch {
       allAds = [];
