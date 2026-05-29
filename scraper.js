@@ -1,31 +1,24 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
-const http = require('http');
 
 const IMAGES_DIR = path.join(__dirname, 'docs', 'images');
 
-// Download image via Node http/https and save to disk
-function downloadImage(url, destPath) {
-  return new Promise((resolve) => {
-    if (!url) return resolve(false);
-    const proto = url.startsWith('https') ? https : http;
-    const file = fs.createWriteStream(destPath);
-    const req = proto.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Referer': 'https://www.facebook.com/',
-      },
-      timeout: 10000,
-    }, (res) => {
-      if (res.statusCode !== 200) { file.close(); fs.unlink(destPath, ()=>{}); return resolve(false); }
-      res.pipe(file);
-      file.on('finish', () => { file.close(); resolve(true); });
+// Download image using Playwright's browser context (inherits cookies + session)
+async function downloadImage(context, url, destPath) {
+  if (!url) return false;
+  try {
+    const response = await context.request.get(url, {
+      headers: { 'Referer': 'https://www.facebook.com/' },
+      timeout: 12000,
     });
-    req.on('error', () => { file.close(); fs.unlink(destPath, ()=>{}); resolve(false); });
-    req.on('timeout', () => { req.destroy(); resolve(false); });
-  });
+    if (!response.ok()) return false;
+    const buffer = await response.body();
+    fs.writeFileSync(destPath, buffer);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 const OUTPUT_PATH = path.join(__dirname, 'data', 'ads.json');
@@ -257,14 +250,14 @@ async function run() {
         const avatarFile   = path.join(IMAGES_DIR, `${ad.libraryId}_avatar.jpg`);
 
         if (ad.creativeImageUrl && !fs.existsSync(creativeFile)) {
-          const ok = await downloadImage(ad.creativeImageUrl, creativeFile);
+          const ok = await downloadImage(context, ad.creativeImageUrl, creativeFile);
           if (ok) { localCreative = `images/${ad.libraryId}_creative.jpg`; }
         } else if (fs.existsSync(creativeFile)) {
           localCreative = `images/${ad.libraryId}_creative.jpg`;
         }
 
         if (ad.avatarUrl && !fs.existsSync(avatarFile)) {
-          const ok = await downloadImage(ad.avatarUrl, avatarFile);
+          const ok = await downloadImage(context, ad.avatarUrl, avatarFile);
           if (ok) { localAvatar = `images/${ad.libraryId}_avatar.jpg`; }
         } else if (fs.existsSync(avatarFile)) {
           localAvatar = `images/${ad.libraryId}_avatar.jpg`;
