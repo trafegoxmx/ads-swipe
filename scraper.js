@@ -1,6 +1,32 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+const http = require('http');
+
+const IMAGES_DIR = path.join(__dirname, 'docs', 'images');
+
+// Download image via Node http/https and save to disk
+function downloadImage(url, destPath) {
+  return new Promise((resolve) => {
+    if (!url) return resolve(false);
+    const proto = url.startsWith('https') ? https : http;
+    const file = fs.createWriteStream(destPath);
+    const req = proto.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Referer': 'https://www.facebook.com/',
+      },
+      timeout: 10000,
+    }, (res) => {
+      if (res.statusCode !== 200) { file.close(); fs.unlink(destPath, ()=>{}); return resolve(false); }
+      res.pipe(file);
+      file.on('finish', () => { file.close(); resolve(true); });
+    });
+    req.on('error', () => { file.close(); fs.unlink(destPath, ()=>{}); resolve(false); });
+    req.on('timeout', () => { req.destroy(); resolve(false); });
+  });
+}
 
 const OUTPUT_PATH = path.join(__dirname, 'data', 'ads.json');
 const SCREENSHOT_PATH = path.join(__dirname, 'data', 'debug.png');
@@ -124,22 +150,34 @@ async function extractAdsFromPage(page) {
         let creativeImageUrl = null;
 
         const allImgs = Array.from(card.querySelectorAll('img[src]'));
+
+        // Facebook CDN URLs: upgrade size param to get higher quality
+        function upgradeUrl(src, size) {
+          return src
+            .replace(/stp=dst-jpg_s\d+x\d+[^&]*/,  `stp=dst-jpg_s${size}`)
+            .replace(/s\d+x\d+/g, `s${size}`)
+            .replace(/p\d+x\d+/g, `p${size}`);
+        }
+
         allImgs.forEach(img => {
           const src = img.src || '';
-          const w = img.naturalWidth || img.width || 0;
-          const h = img.naturalHeight || img.height || 0;
-          const isSmall = w <= 80 || h <= 80 || src.includes('s60x60') || src.includes('s80x80') || src.includes('p40x40') || src.includes('p60x60');
-          if (isSmall && !avatarUrl) {
-            // Upgrade to larger avatar
-            avatarUrl = src.replace(/s\d+x\d+/, 's160x160').replace(/p\d+x\d+/, 'p160x160');
-          } else if (!isSmall && !creativeImageUrl) {
-            creativeImageUrl = src.replace(/s\d+x\d+/, 's600x600');
+          // Avatar: profile pics have p40x40, p60x60, s40x40, s60x60 OR are visually small
+          const isAvatar = /[sp](40|60|80)x(40|60|80)/.test(src) || src.includes('tt6') && (img.width||0) <= 80;
+          if (isAvatar && !avatarUrl) {
+            avatarUrl = upgradeUrl(src, '160x160');
+          } else if (!isAvatar && !creativeImageUrl) {
+            creativeImageUrl = upgradeUrl(src, '600x600');
           }
         });
 
-        // Fallback: if only one image found, use as creative and derive avatar
-        if (!creativeImageUrl && avatarUrl) { creativeImageUrl = avatarUrl; avatarUrl = null; }
-        if (!creativeImageUrl && allImgs[0]) creativeImageUrl = allImgs[0].src;
+        // Fallback: if only one type found, use as creative
+        if (!creativeImageUrl && avatarUrl) {
+          creativeImageUrl = upgradeUrl(avatarUrl, '600x600');
+          avatarUrl = upgradeUrl(avatarUrl, '160x160');
+        }
+        if (!creativeImageUrl && allImgs[0]) {
+          creativeImageUrl = upgradeUrl(allImgs[0].src, '600x600');
+        }
 
         if (libraryId) {
           results.push({ libraryId, pageName, startedText, creativeText, avatarUrl, creativeImageUrl });
@@ -194,6 +232,7 @@ async function run() {
   await page.screenshot({ path: SCREENSHOT_PATH, fullPage: false });
   console.log(`[ads-swipe] Screenshot saved to ${SCREENSHOT_PATH}`);
 
+  fs.mkdirSync(IMAGES_DIR, { recursive: true });
   const seen = new Set();
 
   async function collectCurrent() {
@@ -209,6 +248,29 @@ async function run() {
       const { startDate, daysActive } = parseDaysActive(ad.startedText || '');
       const creativeCount = parseCreativeCount(ad.creativeText || '0');
 
+      // Download and save images locally so they don't expire
+      let localCreative = null;
+      let localAvatar   = null;
+
+      if (ad.libraryId) {
+        const creativeFile = path.join(IMAGES_DIR, `${ad.libraryId}_creative.jpg`);
+        const avatarFile   = path.join(IMAGES_DIR, `${ad.libraryId}_avatar.jpg`);
+
+        if (ad.creativeImageUrl && !fs.existsSync(creativeFile)) {
+          const ok = await downloadImage(ad.creativeImageUrl, creativeFile);
+          if (ok) { localCreative = `images/${ad.libraryId}_creative.jpg`; }
+        } else if (fs.existsSync(creativeFile)) {
+          localCreative = `images/${ad.libraryId}_creative.jpg`;
+        }
+
+        if (ad.avatarUrl && !fs.existsSync(avatarFile)) {
+          const ok = await downloadImage(ad.avatarUrl, avatarFile);
+          if (ok) { localAvatar = `images/${ad.libraryId}_avatar.jpg`; }
+        } else if (fs.existsSync(avatarFile)) {
+          localAvatar = `images/${ad.libraryId}_avatar.jpg`;
+        }
+      }
+
       collectedAds.push({
         libraryId: ad.libraryId,
         pageName: ad.pageName,
@@ -216,7 +278,8 @@ async function run() {
         startDate,
         daysActive,
         creativeCount,
-        imageUrl: ad.imageUrl,
+        avatarUrl: localAvatar,
+        creativeImageUrl: localCreative,
       });
       newCount++;
     }
