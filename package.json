@@ -1,0 +1,13 @@
+{
+  "name": "ads-swipe",
+  "version": "1.0.0",
+  "description": "Facebook Ads Library scraper and swipe file generator",
+  "main": "scraper.js",
+  "scripts": {
+    "scrape": "node scraper.js",
+    "start": "npx serve site"
+  },
+  "dependencies": {
+    "playwright": "^1.44.0"
+  }
+}

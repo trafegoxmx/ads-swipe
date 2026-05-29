@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ads Swipe File</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #17181c;
+      --surface2: #1f2027;
+      --border: #2a2b33;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --text: #e8e8f0;
+      --muted: #7b7c8e;
+      --green: #22c55e;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--accent); }
+
+    .meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── Controls ── */
+    .controls {
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 140px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    input[type="number"] {
+      width: 72px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 28px 32px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.15s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: var(--surface2);
+      display: block;
+    }
+
+    .card-thumb-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 2rem;
+    }
+
+    .card-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .page-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .stat.highlight {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .stat.highlight strong { color: var(--accent); }
+
+    .card-footer {
+      padding: 0 16px 14px;
+    }
+
+    .lib-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: border-color 0.15s, color 0.15s;
+      width: 100%;
+      justify-content: center;
+    }
+    .lib-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty h2 { font-size: 1.1rem; margin-bottom: 8px; }
+    .empty p { font-size: 0.85rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header, .controls, .grid { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ads<span>swipe</span></div>
+  <div class="meta" id="meta">Loading ads...</div>
+</header>
+
+<div class="controls">
+  <div class="control-group">
+    <label>Min creatives</label>
+    <input type="range" id="slider" min="0" max="1000" value="100" step="10" />
+    <input type="number" id="minInput" value="100" min="0" />
+  </div>
+
+  <div class="control-group">
+    <label>Sort by</label>
+    <select id="sort">
+      <option value="creatives">Most creatives</option>
+      <option value="recent">Most recent</option>
+      <option value="oldest">Oldest first</option>
+      <option value="days">Days active ↑</option>
+    </select>
+  </div>
+
+  <span class="badge" id="count">0 ads</span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+  let allAds = [];
+
+  async function loadAds() {
+    try {
+      const res = await fetch('../data/ads.json');
+      allAds = await res.json();
+    } catch {
+      allAds = [];
+    }
+    render();
+  }
+
+  function render() {
+    const min = parseInt(document.getElementById('minInput').value) || 0;
+    const sort = document.getElementById('sort').value;
+
+    let ads = allAds.filter(a => (a.creativeCount || 0) >= min);
+
+    if (sort === 'creatives') ads.sort((a, b) => b.creativeCount - a.creativeCount);
+    else if (sort === 'recent') ads.sort((a, b) => (a.daysActive ?? 9999) - (b.daysActive ?? 9999));
+    else if (sort === 'oldest') ads.sort((a, b) => (b.daysActive ?? 0) - (a.daysActive ?? 0));
+    else if (sort === 'days') ads.sort((a, b) => (a.daysActive ?? 9999) - (b.daysActive ?? 9999));
+
+    document.getElementById('count').textContent = `${ads.length} ads`;
+    document.getElementById('meta').textContent =
+      `${allAds.length} total scraped · ${ads.length} shown`;
+
+    const grid = document.getElementById('grid');
+    if (ads.length === 0) {
+      grid.innerHTML = `
+        <div class="empty">
+          <h2>No ads found</h2>
+          <p>Try lowering the minimum creatives threshold, or run the scraper first.</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = ads.map(ad => {
+      const thumb = ad.imageUrl
+        ? `<img class="card-thumb" src="${escHtml(ad.imageUrl)}" alt="Ad creative" loading="lazy" onerror="this.replaceWith(makePlaceholder())" />`
+        : `<div class="card-thumb-placeholder">🖼</div>`;
+
+      const days = ad.daysActive != null ? ad.daysActive : '?';
+      const startDate = ad.startDate || 'Unknown';
+      const creatives = ad.creativeCount ?? '?';
+      const page = ad.pageName || 'Unknown page';
+      const libId = ad.libraryId || '';
+      const adUrl = ad.adUrl || '#';
+
+      return `
+        <div class="card">
+          ${thumb}
+          <div class="card-body">
+            <div class="page-name" title="${escHtml(page)}">${escHtml(page)}</div>
+            <div class="stats">
+              <div class="stat highlight">
+                <strong>${escHtml(String(creatives))}</strong> creatives
+              </div>
+              <div class="stat">
+                <strong>${escHtml(String(days))}</strong> days active
+              </div>
+              <div class="stat">
+                Started <strong>${escHtml(startDate)}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a class="lib-link" href="${escHtml(adUrl)}" target="_blank" rel="noopener">
+              ↗ Library ID: ${escHtml(libId)}
+            </a>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // Sync slider ↔ number input
+  const slider = document.getElementById('slider');
+  const minInput = document.getElementById('minInput');
+  slider.addEventListener('input', () => { minInput.value = slider.value; render(); });
+  minInput.addEventListener('input', () => { slider.value = minInput.value; render(); });
+  document.getElementById('sort').addEventListener('change', render);
+
+  loadAds();
+</script>
+</body>
+</html>
